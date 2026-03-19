@@ -26,6 +26,8 @@
       --text-primary: #f0f6ff;
       --text-secondary: rgba(180, 210, 255, 0.75);
       --text-muted: rgba(130, 170, 220, 0.55);
+      --sidebar-width: 220px;
+      --sidebar-collapsed: 64px;
     }
 
     html, body {
@@ -38,14 +40,11 @@
       color: var(--text-primary);
       min-height: 100vh;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
       overflow-x: hidden;
       position: relative;
     }
 
-    /* Animated background orbs */
+    /* Background orbs */
     body::before {
       content: '';
       position: fixed;
@@ -77,11 +76,262 @@
       100% { transform: translate(-60px, 80px) scale(1.1); }
     }
 
-    .page-wrapper {
+    /* ── Sidebar ── */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: var(--sidebar-width);
+      background: rgba(10, 16, 45, 0.85);
+      border-right: 1px solid var(--glass-border);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+      transition: width 0.25s ease;
+      overflow: hidden;
+    }
+
+    .sidebar.collapsed {
+      width: var(--sidebar-collapsed);
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 20px 16px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      min-height: 72px;
+    }
+
+    .sidebar-logo {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #1a6cf6 0%, #0a3fa8 100%);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.15), 0 4px 16px rgba(26,108,246,0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sidebar-logo::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 50%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.2), transparent);
+      border-radius: 10px 10px 0 0;
+    }
+
+    .sidebar-logo svg {
+      width: 16px;
+      height: 16px;
+      fill: white;
       position: relative;
       z-index: 1;
+    }
+
+    .sidebar-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      background: linear-gradient(135deg, #ffffff 30%, var(--blue-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      white-space: nowrap;
+      opacity: 1;
+      transition: opacity 0.2s ease;
+    }
+
+    .sidebar.collapsed .sidebar-title {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Toggle button */
+    .sidebar-toggle {
+      position: absolute;
+      top: 20px;
+      right: -12px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--blue-accent);
+      border: 2px solid rgba(255,255,255,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 101;
+      box-shadow: 0 2px 8px rgba(26,108,246,0.5);
+      transition: transform 0.25s ease, background 0.2s;
+    }
+
+    .sidebar-toggle:hover {
+      background: var(--blue-bright);
+    }
+
+    .sidebar-toggle svg {
+      width: 10px;
+      height: 10px;
+      fill: white;
+      transition: transform 0.25s ease;
+    }
+
+    .sidebar.collapsed .sidebar-toggle svg {
+      transform: rotate(180deg);
+    }
+
+    /* Nav items */
+    .sidebar-nav {
+      flex: 1;
+      padding: 12px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .nav-section-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 8px 8px 4px;
+      white-space: nowrap;
+      opacity: 1;
+      transition: opacity 0.2s ease;
+    }
+
+    .sidebar.collapsed .nav-section-label {
+      opacity: 0;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+      position: relative;
+      white-space: nowrap;
+      color: var(--text-secondary);
+      user-select: none;
+    }
+
+    .nav-item:hover {
+      background: rgba(255,255,255,0.06);
+      color: var(--text-primary);
+    }
+
+    .nav-item.active {
+      background: rgba(26, 108, 246, 0.18);
+      color: var(--text-primary);
+      border: 1px solid rgba(26, 108, 246, 0.3);
+    }
+
+    .nav-item.active .nav-icon {
+      color: var(--blue-bright);
+    }
+
+    .nav-icon {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    .nav-label {
+      font-size: 13.5px;
+      font-weight: 500;
+      opacity: 1;
+      transition: opacity 0.2s ease;
+    }
+
+    .sidebar.collapsed .nav-label {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Tooltip on collapsed */
+    .sidebar.collapsed .nav-item::after {
+      content: attr(data-label);
+      position: absolute;
+      left: calc(var(--sidebar-collapsed) - 4px);
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(10, 16, 45, 0.95);
+      border: 1px solid var(--glass-border);
+      color: var(--text-primary);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 5px 10px;
+      border-radius: 7px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      z-index: 200;
+    }
+
+    .sidebar.collapsed .nav-item:hover::after {
+      opacity: 1;
+    }
+
+    /* Sidebar footer */
+    .sidebar-footer {
+      padding: 12px 8px 20px;
+      border-top: 1px solid rgba(255,255,255,0.07);
+    }
+
+    /* ── Main content ── */
+    .main {
+      margin-left: var(--sidebar-width);
+      flex: 1;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      position: relative;
+      z-index: 1;
+      transition: margin-left 0.25s ease;
+    }
+
+    .sidebar.collapsed ~ .main {
+      margin-left: var(--sidebar-collapsed);
+    }
+
+    /* Tab panels */
+    .tab-panel {
+      display: none;
+      width: 100%;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    .page-wrapper {
       width: 100%;
       max-width: 480px;
+      margin: 0 auto;
     }
 
     /* Header */
@@ -157,7 +407,6 @@
       overflow: hidden;
     }
 
-    /* Glossy top shine */
     .card::before {
       content: '';
       position: absolute;
@@ -349,34 +598,11 @@
       transition: all 0.3s ease 0.2s;
     }
 
-    .rate-badge.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .rate-badge.great {
-      background: rgba(34, 197, 94, 0.15);
-      border: 1px solid rgba(34, 197, 94, 0.3);
-      color: #86efac;
-    }
-
-    .rate-badge.good {
-      background: rgba(59, 141, 255, 0.15);
-      border: 1px solid rgba(59, 141, 255, 0.3);
-      color: #93c5fd;
-    }
-
-    .rate-badge.low {
-      background: rgba(251, 146, 60, 0.15);
-      border: 1px solid rgba(251, 146, 60, 0.3);
-      color: #fdba74;
-    }
-
-    .rate-badge.very-low {
-      background: rgba(239, 68, 68, 0.12);
-      border: 1px solid rgba(239, 68, 68, 0.25);
-      color: #fca5a5;
-    }
+    .rate-badge.visible { opacity: 1; transform: translateY(0); }
+    .rate-badge.great { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); color: #86efac; }
+    .rate-badge.good  { background: rgba(59,141,255,0.15); border: 1px solid rgba(59,141,255,0.3); color: #93c5fd; }
+    .rate-badge.low   { background: rgba(251,146,60,0.15); border: 1px solid rgba(251,146,60,0.3); color: #fdba74; }
+    .rate-badge.very-low { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.25); color: #fca5a5; }
 
     /* Stats row */
     .stats-row {
@@ -389,10 +615,7 @@
       transition: all 0.35s ease 0.15s;
     }
 
-    .stats-row.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    .stats-row.visible { opacity: 1; transform: translateY(0); }
 
     .stat-card {
       background: rgba(255,255,255,0.04);
@@ -411,20 +634,8 @@
       background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
     }
 
-    .stat-label {
-      font-size: 11px;
-      font-weight: 500;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 4px;
-    }
-
-    .stat-value {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--text-primary);
-    }
+    .stat-label { font-size: 11px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+    .stat-value { font-size: 18px; font-weight: 700; color: var(--text-primary); }
 
     /* Footer */
     .footer {
@@ -434,147 +645,332 @@
       color: var(--text-muted);
     }
 
-    /* Glow pulse on result update */
+    /* Glow pulse */
     @keyframes resultGlow {
-      0% { box-shadow: 0 0 0 0 rgba(26, 108, 246, 0.4); }
-      50% { box-shadow: 0 0 0 8px rgba(26, 108, 246, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(26, 108, 246, 0); }
+      0%   { box-shadow: 0 0 0 0 rgba(26,108,246,0.4); }
+      50%  { box-shadow: 0 0 0 8px rgba(26,108,246,0); }
+      100% { box-shadow: 0 0 0 0 rgba(26,108,246,0); }
+    }
+    .result.glow { animation: resultGlow 0.6s ease-out; }
+
+    /* ── Placeholder tabs ── */
+    .placeholder-page {
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+      text-align: center;
     }
 
-    .result.glow {
-      animation: resultGlow 0.6s ease-out;
+    .placeholder-icon {
+      font-size: 48px;
+      margin-bottom: 20px;
+      line-height: 1;
+    }
+
+    .placeholder-page h2 {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #ffffff 30%, var(--blue-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .placeholder-page p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .coming-soon-badge {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 6px 16px;
+      border-radius: 100px;
+      background: rgba(26,108,246,0.12);
+      border: 1px solid rgba(26,108,246,0.25);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--blue-light);
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Mobile ── */
+    @media (max-width: 640px) {
+      .sidebar {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        top: auto;
+        bottom: 0;
+        border-right: none;
+        border-top: 1px solid var(--glass-border);
+        padding: 0;
+      }
+
+      .sidebar-header,
+      .sidebar-footer,
+      .nav-section-label,
+      .sidebar-toggle {
+        display: none;
+      }
+
+      .sidebar-nav {
+        flex-direction: row;
+        padding: 0;
+        gap: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        width: 100%;
+      }
+
+      .nav-item {
+        flex-direction: column;
+        gap: 4px;
+        flex: 1;
+        justify-content: center;
+        padding: 10px 8px;
+        border-radius: 0;
+        min-width: 60px;
+        border: none !important;
+      }
+
+      .nav-label {
+        font-size: 10px;
+        opacity: 1 !important;
+      }
+
+      .nav-icon {
+        font-size: 18px;
+      }
+
+      .main {
+        margin-left: 0 !important;
+        padding-bottom: 80px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="page-wrapper">
-    <div class="brand">
-      <div class="brand-icon">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/>
-        </svg>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
       </div>
-      <h1>VideoRate</h1>
-      <p>Know your worth as a video editor</p>
+      <span class="sidebar-title">VideoRate</span>
+      <div class="sidebar-toggle" id="sidebar-toggle" title="Toggle sidebar">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+      </div>
     </div>
 
-    <div class="card">
-      <div class="field-group">
-        <div class="field">
-          <label>Project Payment</label>
-          <div class="input-wrap">
-            <span class="input-prefix">$</span>
-            <input
-              type="number"
-              id="payment"
-              placeholder="0.00"
-              min="0"
-              step="0.01"
-              inputmode="decimal"
-            />
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Tools</div>
+
+      <div class="nav-item active" data-tab="rate-calc" data-label="Rate Calc">
+        <span class="nav-icon">⚡</span>
+        <span class="nav-label">Rate Calculator</span>
+      </div>
+
+      <div class="nav-item" data-tab="quote-builder" data-label="Quote Builder">
+        <span class="nav-icon">📋</span>
+        <span class="nav-label">Quote Builder</span>
+      </div>
+
+      <div class="nav-item" data-tab="income-goal" data-label="Income Goal">
+        <span class="nav-icon">🎯</span>
+        <span class="nav-label">Income Goal</span>
+      </div>
+
+      <div class="nav-item" data-tab="market-rates" data-label="Market Rates">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">Market Rates</span>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="nav-item" data-tab="settings" data-label="Settings">
+        <span class="nav-icon">⚙️</span>
+        <span class="nav-label">Settings</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="main" id="main">
+
+    <!-- Tab: Rate Calculator -->
+    <div class="tab-panel active" id="tab-rate-calc">
+      <div class="page-wrapper">
+        <div class="brand">
+          <div class="brand-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+          </div>
+          <h1>VideoRate</h1>
+          <p>Know your worth as a video editor</p>
+        </div>
+
+        <div class="card">
+          <div class="field-group">
+            <div class="field">
+              <label>Project Payment</label>
+              <div class="input-wrap">
+                <span class="input-prefix">$</span>
+                <input type="number" id="payment" placeholder="0.00" min="0" step="0.01" inputmode="decimal" />
+              </div>
+            </div>
+            <div class="field">
+              <label>Hours Worked</label>
+              <div class="input-wrap">
+                <span class="input-prefix" style="font-size:14px;">⏱</span>
+                <input type="number" id="hours" placeholder="0" min="0" step="0.5" inputmode="decimal" />
+                <span class="input-suffix">hrs</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="result" id="result">
+            <div class="result-label">Your Hourly Rate</div>
+            <div class="result-value empty" id="result-value">—</div>
+            <div class="result-sub" id="result-sub"></div>
+            <div class="rate-badge" id="rate-badge"></div>
+          </div>
+
+          <div class="stats-row" id="stats-row">
+            <div class="stat-card">
+              <div class="stat-label">Daily Rate (8h)</div>
+              <div class="stat-value" id="stat-daily">—</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Monthly Est. (20d)</div>
+              <div class="stat-value" id="stat-monthly">—</div>
+            </div>
           </div>
         </div>
 
-        <div class="field">
-          <label>Hours Worked</label>
-          <div class="input-wrap">
-            <span class="input-prefix" style="font-size:14px;">⏱</span>
-            <input
-              type="number"
-              id="hours"
-              placeholder="0"
-              min="0"
-              step="0.5"
-              inputmode="decimal"
-            />
-            <span class="input-suffix">hrs</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="result" id="result">
-        <div class="result-label">Your Hourly Rate</div>
-        <div class="result-value empty" id="result-value">—</div>
-        <div class="result-sub" id="result-sub"></div>
-        <div class="rate-badge" id="rate-badge"></div>
-      </div>
-
-      <div class="stats-row" id="stats-row">
-        <div class="stat-card">
-          <div class="stat-label">Daily Rate (8h)</div>
-          <div class="stat-value" id="stat-daily">—</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Monthly Est. (20d)</div>
-          <div class="stat-value" id="stat-monthly">—</div>
-        </div>
+        <div class="footer">Built for video editors who know their craft</div>
       </div>
     </div>
 
-    <div class="footer">
-      Built for video editors who know their craft
+    <!-- Tab: Quote Builder -->
+    <div class="tab-panel" id="tab-quote-builder">
+      <div class="placeholder-page">
+        <div class="placeholder-icon">📋</div>
+        <h2>Quote Builder</h2>
+        <p>Build a full project quote based on your hourly rate and estimated hours for each task.</p>
+        <span class="coming-soon-badge">Coming Soon</span>
+      </div>
     </div>
-  </div>
+
+    <!-- Tab: Income Goal -->
+    <div class="tab-panel" id="tab-income-goal">
+      <div class="placeholder-page">
+        <div class="placeholder-icon">🎯</div>
+        <h2>Income Goal</h2>
+        <p>Set a monthly income target and find out exactly what hourly rate you need to charge to hit it.</p>
+        <span class="coming-soon-badge">Coming Soon</span>
+      </div>
+    </div>
+
+    <!-- Tab: Market Rates -->
+    <div class="tab-panel" id="tab-market-rates">
+      <div class="placeholder-page">
+        <div class="placeholder-icon">📊</div>
+        <h2>Market Rates</h2>
+        <p>Browse industry-standard rates for video editors at every experience level and niche.</p>
+        <span class="coming-soon-badge">Coming Soon</span>
+      </div>
+    </div>
+
+    <!-- Tab: Settings -->
+    <div class="tab-panel" id="tab-settings">
+      <div class="placeholder-page">
+        <div class="placeholder-icon">⚙️</div>
+        <h2>Settings</h2>
+        <p>Customize your currency, working hours, and preferences.</p>
+        <span class="coming-soon-badge">Coming Soon</span>
+      </div>
+    </div>
+
+  </main>
 
   <script>
+    // ── Sidebar toggle ──
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('sidebar-toggle');
+
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('collapsed');
+    });
+
+    // ── Tab switching ──
+    const navItems = document.querySelectorAll('.nav-item[data-tab]');
+
+    navItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const tab = item.dataset.tab;
+
+        // Update nav active state
+        navItems.forEach(n => n.classList.remove('active'));
+        item.classList.add('active');
+
+        // Show correct panel
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.getElementById('tab-' + tab).classList.add('active');
+      });
+    });
+
+    // ── Rate Calculator logic ──
     const paymentInput = document.getElementById('payment');
-    const hoursInput = document.getElementById('hours');
-    const resultValue = document.getElementById('result-value');
-    const resultSub = document.getElementById('result-sub');
-    const rateBadge = document.getElementById('rate-badge');
-    const statsRow = document.getElementById('stats-row');
-    const statDaily = document.getElementById('stat-daily');
-    const statMonthly = document.getElementById('stat-monthly');
-    const resultEl = document.getElementById('result');
+    const hoursInput   = document.getElementById('hours');
+    const resultValue  = document.getElementById('result-value');
+    const resultSub    = document.getElementById('result-sub');
+    const rateBadge    = document.getElementById('rate-badge');
+    const statsRow     = document.getElementById('stats-row');
+    const statDaily    = document.getElementById('stat-daily');
+    const statMonthly  = document.getElementById('stat-monthly');
+    const resultEl     = document.getElementById('result');
 
     function formatCurrency(val) {
-      if (val >= 1000) {
-        return '$' + (val / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
-      }
+      if (val >= 1000) return '$' + (val / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
       return '$' + val.toFixed(2).replace(/\.00$/, '');
     }
 
     function getRating(rate) {
-      if (rate >= 100) return { cls: 'great', icon: '🚀', label: 'Excellent rate' };
-      if (rate >= 60)  return { cls: 'good',  icon: '✦', label: 'Solid rate' };
-      if (rate >= 30)  return { cls: 'low',   icon: '▲', label: 'Consider raising rates' };
-      return                  { cls: 'very-low', icon: '↑', label: 'Below industry average' };
+      if (rate >= 100) return { cls: 'great',    icon: '🚀', label: 'Excellent rate' };
+      if (rate >= 60)  return { cls: 'good',     icon: '✦',  label: 'Solid rate' };
+      if (rate >= 30)  return { cls: 'low',      icon: '▲',  label: 'Consider raising rates' };
+      return                  { cls: 'very-low', icon: '↑',  label: 'Below industry average' };
     }
 
     function calculate() {
       const payment = parseFloat(paymentInput.value);
-      const hours = parseFloat(hoursInput.value);
+      const hours   = parseFloat(hoursInput.value);
 
       if (!isNaN(payment) && !isNaN(hours) && hours > 0 && payment >= 0) {
         const rate = payment / hours;
 
-        // Update main result
         resultValue.classList.remove('empty');
         resultValue.textContent = formatCurrency(rate) + '/hr';
 
-        // Sub label
         resultSub.textContent = `$${payment.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})} ÷ ${hours}h`;
         resultSub.classList.add('visible');
 
-        // Rating badge
         const { cls, icon, label } = getRating(rate);
         rateBadge.className = 'rate-badge ' + cls + ' visible';
         rateBadge.textContent = icon + ' ' + label;
 
-        // Stats
-        const daily = rate * 8;
-        const monthly = daily * 20;
-        statDaily.textContent = formatCurrency(daily);
-        statMonthly.textContent = formatCurrency(monthly);
+        statDaily.textContent   = formatCurrency(rate * 8);
+        statMonthly.textContent = formatCurrency(rate * 8 * 20);
         statsRow.classList.add('visible');
 
-        // Glow pulse
         resultEl.classList.remove('glow');
         void resultEl.offsetWidth;
         resultEl.classList.add('glow');
-
       } else {
         resultValue.classList.add('empty');
         resultValue.textContent = '—';
